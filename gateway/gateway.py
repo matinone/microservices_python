@@ -46,6 +46,7 @@ def upload():
         return "Exactly 1 file required", 400
 
     for _, file_to_upload in request.files.items():
+        # upload file to MongoDB +
         # async communication with the converter service
         err = upload_video(file_to_upload, fs, channel, access)
 
