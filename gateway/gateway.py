@@ -19,7 +19,7 @@ fs = gridfs.GridFS(mongo.db)
 
 # RabbitMQ connection (synchronous)
 rabbitmq_connection = pika.BlockingConnection(pika.ConnectionParameters(("rabbitmq")))
-channel = connection.channel()
+channel = rabbitmq_connection.channel()
 
 @server.route("/login", methods=["POST"])
 def login():
@@ -56,7 +56,7 @@ def upload():
     return "Success", 200
 
 
-@server.route("/download", methods="GET")
+@server.route("/download", methods=["GET"])
 def download():
     pass
 

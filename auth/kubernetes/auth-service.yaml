@@ -5,7 +5,7 @@ metadata:
 spec:
   selector:
     app: auth
-  type: ClusterIP
+  type: LoadBalancer
   ports:
     - protocol: TCP
       port: 5000
