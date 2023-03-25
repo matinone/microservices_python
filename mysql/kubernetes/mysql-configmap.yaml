@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: mysql-configmap
 data:
-  PLACEHOLDER: "NONE"
+  MYSQL_USER: auth_user

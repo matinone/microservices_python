@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import jwt
 from flask import Flask, request
@@ -25,9 +25,8 @@ def login():
     # (passwords shouldn't be stored in plaint text :) )
     cur = mysql.connection.cursor()
     # this is vulnerable to SQL injection
-    res = cur.execute(
-        f"SELECT email, password FROM user WHERE email={auth.username}"
-    )
+    query = f"SELECT email, password FROM users WHERE email='{auth.username}'"
+    res = cur.execute(query)
     if res > 0:
         user_row = cur.fetchone()
         email = user_row[0]
@@ -61,7 +60,7 @@ def validate():
 def create_jwt(username, secret, admin=False):
     payload = {
         "username": username,
-        "exp": datetime.utcnow() + datetime.timedelta(hours=1),
+        "exp": datetime.utcnow() + timedelta(hours=1),
         "iat": datetime.utcnow(),
         "admin": admin,
     }
