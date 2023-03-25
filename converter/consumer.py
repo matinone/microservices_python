@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 
 import gridfs
 import pika
@@ -45,7 +44,7 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt():
+    except KeyboardInterrupt:
         print("Interrupted by user")
         try:
             sys.exit(0)
