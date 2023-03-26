@@ -12,7 +12,7 @@ def start_conversion(message, fs_videos, fs_mp3s, channel):
 
     # get video contents from MongoDB and put them in a temp file
     video_content = fs_videos.get(ObjectId(message["video_file_id"]))
-    temp_file = tempfile.NamedTemporaryFile(mode)
+    temp_file = tempfile.NamedTemporaryFile()
     temp_file.write(video_content.read())
 
     # create audio from video file
