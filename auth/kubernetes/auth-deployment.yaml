@@ -21,6 +21,7 @@ spec:
       containers:
         - name: auth-cont
           image: mbrignone/auth_microservice
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           envFrom:

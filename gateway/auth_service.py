@@ -19,7 +19,7 @@ def auth_login(request):
 
 
 def validate_token(request):
-    if not "Authorization" in request.headears:
+    if not "Authorization" in request.headers:
         return None, ("Missing credentials", 401)
 
     token = request.headers["Authorization"]

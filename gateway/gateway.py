@@ -48,7 +48,7 @@ def upload():
     for _, file_to_upload in request.files.items():
         # upload file to MongoDB +
         # async communication with the converter service
-        err = upload_video(file_to_upload, fs, channel, access)
+        err = upload_video(file_to_upload, fs, channel, access, server)
 
         if err:
             return err
@@ -65,4 +65,4 @@ if __name__ == "__main__":
     # host="0.0.0.0" to make it externally visible
     # otherwise it would be accessible only from localhost,
     # and not from a network when running it using Docker
-    server.run(host="0.0.0.0", port=8080)
+    server.run(host="0.0.0.0", port=8080, debug=True)
