@@ -49,9 +49,10 @@ def validate():
     encoded_jwt = encoded_jwt.split(" ")[1]
     try:
         decoded_jwt = jwt.decode(
-            encoded_jwt, os.environ.get("JWT_SECRET"), algorithm="HS256"
+            encoded_jwt, os.environ.get("JWT_SECRET"), algorithms="HS256"
         )
-    except:
+    except Exception as e:
+        server.logger.info(e)
         return "Not authorized", 403
 
     return decoded_jwt, 200
@@ -72,4 +73,4 @@ if __name__ == "__main__":
     # host="0.0.0.0" to make it externally visible
     # otherwise it would be accessible only from localhost,
     # and not from a network when running it using Docker
-    server.run(host="0.0.0.0", port=5000)
+    server.run(host="0.0.0.0", port=5000, debug=True)

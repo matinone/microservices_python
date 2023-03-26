@@ -2,10 +2,11 @@ import json
 import pika
 
 
-def upload_video(file_to_upload, fs, channel, access):
+def upload_video(file_to_upload, fs, channel, access, server):
     try:
         file_id = fs.put(file_to_upload)
-    except:
+    except Exception as e:
+        server.logger.info(e)
         return "Internal server error", 500
 
     # put a message in the queue so the downstream converter service
@@ -26,7 +27,8 @@ def upload_video(file_to_upload, fs, channel, access):
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             )
         )
-    except:
+    except Exception as e:
+        server.logger.info(e)
         # delete the file from the DB, because if the message
         # fails to be sent to the queue, the file will never be
         # processed and we would end up we lots of stalled files
