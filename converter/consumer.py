@@ -8,17 +8,9 @@ from pymongo import MongoClient
 from mp3_converter import start_conversion
 
 
-def consume_callback(channel, method, properties, body):
-    err = start_conversion(body, fs_videos, fs_mp3s, channel)
-    if err:
-        channel.basic_nack(delivery_tag=method.delivery_tag)
-    else:
-        channel.basic_ack(delivery_tag=method.delivery_tag)
-
-
 def main():
     # MongoDB
-    client = MongoClient("host.minikube.internal", 27017)
+    client = MongoClient("mongo-service", 27017)
     db_videos = client.videos
     db_mp3s = client.mp3s
 
@@ -29,6 +21,15 @@ def main():
     # RabbitMQ
     connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq"))
     channel = connection.channel()
+
+    # callback defined insided of main() so it has access to fs_videos and fs_mp3s
+    def consume_callback(channel, method, properties, body):
+        err = start_conversion(body, fs_videos, fs_mp3s, channel)
+        if err:
+            channel.basic_nack(delivery_tag=method.delivery_tag)
+        else:
+            channel.basic_ack(delivery_tag=method.delivery_tag)
+
 
     channel.basic_consume(
         queue=os.environ.get("VIDEO_QUEUE"),

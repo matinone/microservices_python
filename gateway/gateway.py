@@ -10,7 +10,7 @@ from auth_service import auth_login, validate_token
 from storage import upload_video
 
 server = Flask(__name__)
-server.config["MONGO_URI"] = "mongodb://host.minikube.internal:27017/videos"
+server.config["MONGO_URI"] = "mongodb://mongo-service:27017/videos"
 
 mongo = PyMongo(server)
 
@@ -18,7 +18,10 @@ mongo = PyMongo(server)
 fs = gridfs.GridFS(mongo.db)
 
 # RabbitMQ connection (synchronous)
-rabbitmq_connection = pika.BlockingConnection(pika.ConnectionParameters(("rabbitmq")))
+# parameters based on https://pika.readthedocs.io/en/stable/examples/heartbeat_and_blocked_timeouts.html
+rabbitmq_connection = pika.BlockingConnection(
+    pika.ConnectionParameters(host="rabbitmq", heartbeat=600, blocked_connection_timeout=300)
+)
 channel = rabbitmq_connection.channel()
 
 @server.route("/login", methods=["POST"])
