@@ -20,7 +20,7 @@ def start_conversion(message, fs_videos, fs_mp3s, channel):
     temp_file.close()   # automatically deletes the file as well
 
     # write audio to a temp file
-    temp_file_path = tempfile.gettempdir() + f"{message['video_file_id']}.mp3"
+    temp_file_path = tempfile.gettempdir() + f"/{message['video_file_id']}.mp3"
     audio.write_audiofile(temp_file_path)
 
     # store audio in MongoDB

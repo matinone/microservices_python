@@ -1,21 +1,29 @@
-import os
 import json
 import gridfs
 
 import pika
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_pymongo import PyMongo
+from bson.objectid import ObjectId
 
 from auth_service import auth_login, validate_token
 from storage import upload_video
 
 server = Flask(__name__)
-server.config["MONGO_URI"] = "mongodb://mongo-service:27017/videos"
 
-mongo = PyMongo(server)
+mongo_video = PyMongo(
+    server,
+    uri="mongodb://mongo-service:27017/videos",
+)
+
+mongo_mp3 = PyMongo(
+    server,
+    uri="mongodb://mongo-service:27017/mp3s",
+)
 
 # for storing and retrieving files that exceed the BSON-document size limit of 16 MB
-fs = gridfs.GridFS(mongo.db)
+fs_videos = gridfs.GridFS(mongo_video.db)
+fs_mp3s = gridfs.GridFS(mongo_mp3.db)
 
 # RabbitMQ connection (synchronous)
 # parameters based on https://pika.readthedocs.io/en/stable/examples/heartbeat_and_blocked_timeouts.html
@@ -51,7 +59,7 @@ def upload():
     for _, file_to_upload in request.files.items():
         # upload file to MongoDB +
         # async communication with the converter service
-        err = upload_video(file_to_upload, fs, channel, access, server)
+        err = upload_video(file_to_upload, fs_videos, channel, access, server)
 
         if err:
             return err
@@ -61,7 +69,24 @@ def upload():
 
 @server.route("/download", methods=["GET"])
 def download():
-    pass
+    access, err = validate_token(request)
+    if err:
+        return err
+
+    access = json.loads(access)
+    if not access.get("admin"):
+        return "Not authorized", 403
+
+    file_id_str = request.args.get("fid")
+    if not file_id_str:
+        return "Missing file ID", 400
+
+    try:
+        mp3_file = fs_mp3s.get(ObjectId(file_id_str))
+        return send_file(mp3_file, download_name=f"{file_id_str}.mp3")
+    except Exception as e:
+        server.logger.info(e)
+        return "Internal server error", 500
 
 
 if __name__ == "__main__":
