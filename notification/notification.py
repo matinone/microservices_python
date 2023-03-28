@@ -13,19 +13,23 @@ def send_notification(message):
         sender_password = os.environ.get("GMAIL_PASSWORD")
         receiver_address = message.get("username")
 
-        email_msg = EmailMessage()
-        email_msg.set_content(f"MP3 file_id: {mp3_file_id} is now READY!")
-        email_msg["Subject"] = "MP3 Download"
-        email_msg["From"] = sender_address
-        email_msg["To"] = receiver_address
+        email_content = f"MP3 file_id: {mp3_file_id} is now READY!"
 
-        session = smtplib.SMTP("smtp.gmail.com")
-        session.starttls()
-        session.login(sender_address, sender_password)
-        session.send_message(email_msg)
-        session.quit()
+        # Google no longer supports less secure apps
 
-        print("Mail sent")
+        # email_msg = EmailMessage()
+        # email_msg.set_content(email_content)
+        # email_msg["Subject"] = "MP3 Download"
+        # email_msg["From"] = sender_address
+        # email_msg["To"] = receiver_address
+
+        # session = smtplib.SMTP("smtp.gmail.com")
+        # session.starttls()
+        # session.login(sender_address, sender_password)
+        # session.send_message(email_msg)
+        # session.quit()
+
+        print(f"Mail sent with content: {email_content}")
 
     except Exception as e:
         print(e)

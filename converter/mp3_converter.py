@@ -24,15 +24,16 @@ def start_conversion(message, fs_videos, fs_mp3s, channel):
     audio.write_audiofile(temp_file_path)
 
     # store audio in MongoDB
-    with open(temp_file_path, "rb") as file_handler:
-        audio_data = file_handler.read()
-        file_id = fs_mp3s.put(audio_data)
+    file_handler = open(temp_file_path, "rb")
+    audio_data = file_handler.read()
+    file_id = fs_mp3s.put(audio_data)
     # not automatically deleted because it wasn't created using the tempfile module
+    file_handler.close()
     os.remove(temp_file_path)
 
     # update message and send it to the MP3 queue
     message["mp3_file_id"] = str(file_id)
-    try: 
+    try:
         channel.basic_publish(
             exchange="",
             routing_key=os.environ.get("MP3_QUEUE"),
@@ -42,7 +43,8 @@ def start_conversion(message, fs_videos, fs_mp3s, channel):
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             )
         )
-    except:
+    except Exception as e:
+        print(e)
         # delete the file from the MongoDB, because it will never be processed
         # if the message isn't sent to the queue
         fs_mp3s.delete(file_id)
