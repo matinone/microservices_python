@@ -23,5 +23,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: gateway-configmap
-            - secretRef:
-                name: gateway-secret

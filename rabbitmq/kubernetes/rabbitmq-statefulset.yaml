@@ -25,8 +25,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: rabbitmq-configmap
-            - secretRef:
-                name: rabbitmq-secret
           volumeMounts:
             - mountPath: "/var/lib/rabbitmq"
               name: rabbitmq-volume
